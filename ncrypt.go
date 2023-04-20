@@ -1784,7 +1784,6 @@ var (
 func Initialize(customLogger Logger) (errRet error) {
 	if nCrypt == nil {
 		// Set logger.
-		logger = NewDefaultLogger(LogLevelInfo)
 		if customLogger != nil {
 			logger = customLogger
 		}
