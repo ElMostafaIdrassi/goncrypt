@@ -2568,6 +2568,8 @@ func (p *Provider) SetProperty(
 		}
 	}()
 
+	var propertyPtr *byte
+
 	logger.Infof("SetProperty, IN : (provider=%v, propertyName=%s, property=%v, flags=0x%.8X)", p, propertyName, property, flags)
 	defer func() { logger.Infof("SetProperty, OUT: (provider=%v, propertyName=%v)", p, propertyName) }()
 
@@ -2576,16 +2578,20 @@ func (p *Provider) SetProperty(
 		return
 	}
 
-	utf16Property, err := stringToUtf16Ptr(string(property))
+	utf16PropertyName, err := stringToUtf16Ptr(string(propertyName))
 	if err != nil {
-		err = fmt.Errorf("failed to parse property \"%s\" (%v)", property, err)
+		err = fmt.Errorf("failed to parse property \"%s\" (%v)", propertyName, err)
 		return
+	}
+
+	if len(property) > 0 {
+		propertyPtr = &property[0]
 	}
 
 	r, _, msg := nCryptSetPropertyProc.Call(
 		uintptr(p.handle),
-		uintptr(unsafe.Pointer(utf16Property)),
-		uintptr(unsafe.Pointer(&property[0])),
+		uintptr(unsafe.Pointer(utf16PropertyName)),
+		uintptr(unsafe.Pointer(propertyPtr)),
 		uintptr(len(property)),
 		uintptr(flags),
 	)
@@ -2922,17 +2928,23 @@ func (p *Provider) CreatePersistedKey(
 	}
 
 	for propertyName, property := range properties {
-		var utf16Property *uint16
-		utf16Property, err = stringToUtf16Ptr(string(propertyName))
+		var utf16PropertyName *uint16
+		var propertyPtr *byte
+
+		utf16PropertyName, err = stringToUtf16Ptr(string(propertyName))
 		if err != nil {
 			err = fmt.Errorf("failed to parse property \"%s\" (%v)", property, err)
 			return
 		}
 
+		if len(property) > 0 {
+			propertyPtr = &property[0]
+		}
+
 		r, _, msg := nCryptSetPropertyProc.Call(
 			uintptr(handle),
-			uintptr(unsafe.Pointer(utf16Property)),
-			uintptr(unsafe.Pointer(&property[0])),
+			uintptr(unsafe.Pointer(utf16PropertyName)),
+			uintptr(unsafe.Pointer(propertyPtr)),
 			uintptr(len(property)),
 			uintptr(setPropertyFlags),
 		)
@@ -3263,6 +3275,8 @@ func (k *Key) SetProperty(
 		}
 	}()
 
+	var propertyPtr *byte
+
 	logger.Infof("SetProperty, IN : (key=%v, propertyName=%s, property=%v, flags=0x%.8X)", k, propertyName, property, flags)
 	defer func() { logger.Infof("SetProperty, OUT: (key=%v, propertyName=%s)", k, propertyName) }()
 
@@ -3271,16 +3285,20 @@ func (k *Key) SetProperty(
 		return
 	}
 
-	utf16Property, err := stringToUtf16Ptr(string(property))
+	utf16PropertyName, err := stringToUtf16Ptr(string(propertyName))
 	if err != nil {
-		err = fmt.Errorf("failed to parse property \"%s\" (%v)", property, err)
+		err = fmt.Errorf("failed to parse property \"%s\" (%v)", propertyName, err)
 		return
+	}
+
+	if len(property) > 0 {
+		propertyPtr = &property[0]
 	}
 
 	r, _, msg := nCryptSetPropertyProc.Call(
 		uintptr(k.handle),
-		uintptr(unsafe.Pointer(utf16Property)),
-		uintptr(unsafe.Pointer(&property[0])),
+		uintptr(unsafe.Pointer(utf16PropertyName)),
+		uintptr(unsafe.Pointer(propertyPtr)),
 		uintptr(len(property)),
 		uintptr(flags),
 	)
