@@ -2333,6 +2333,9 @@ func EnumProviders(
 	var providersCount uint32
 	var providerListPtr *ncryptProviderName
 
+	logger.Infof("EnumProviders, IN : (flags=0x%.8X)", flags)
+	defer func() { logger.Infof("EnumProviders, OUT: (provsInfo=%v)", provsInfo) }()
+
 	if nCryptEnumStorageProvidersProc == nil {
 		err = fmt.Errorf("nCryptEnumStorageProvidersProc() not found in ncrypt.dll")
 		return
@@ -2385,6 +2388,9 @@ func OpenProvider(
 	handle := NcryptProvHandle(invalidHandleValue)
 	provider.handle = NcryptProvHandle(invalidHandleValue)
 
+	logger.Infof("OpenProvider, IN : (name=%s, flags=0x%.8X)", name, flags)
+	defer func() { logger.Infof("OpenProvider, OUT: (provider=%v)", provider) }()
+
 	if nCryptOpenStorageProviderProc == nil {
 		err = fmt.Errorf("nCryptOpenStorageProvider() not found in ncrypt.dll")
 		return
@@ -2428,6 +2434,11 @@ func (p *Provider) GetProperty(
 		if err != nil {
 			logger.Error(err)
 		}
+	}()
+
+	logger.Infof("GetProperty, IN : (provider=%v, propertyName=%s, flags=0x%.8X)", p, propertyName, flags)
+	defer func() {
+		logger.Infof("GetProperty, OUT: (provider=%v, propertyName=%s, property=%v)", p, propertyName, property)
 	}()
 
 	if nCryptGetPropertyProc == nil {
@@ -2503,6 +2514,9 @@ func (p *Provider) SetProperty(
 		}
 	}()
 
+	logger.Infof("SetProperty, IN : (provider=%v, propertyName=%s, property=%v, flags=0x%.8X)", p, propertyName, property, flags)
+	defer func() { logger.Infof("SetProperty, OUT: (provider=%v, propertyName=%v)", p, propertyName) }()
+
 	if nCryptSetPropertyProc == nil {
 		err = fmt.Errorf("nCryptSetProperty() not found in ncrypt.dll")
 		return
@@ -2549,6 +2563,9 @@ func (p *Provider) EnumAlgorithms(
 
 	var algCount uint32
 	var algListPtr *ncryptAlgorithmName
+
+	logger.Infof("EnumAlgorithms, IN : (provider=%v, algOperations=%s, flags=0x%.8X)", p, algOperations.String(), flags)
+	defer func() { logger.Infof("EnumAlgorithms, OUT: (provider=%v, algsInfo=%v)", p, algsInfo) }()
 
 	if nCryptEnumAlgorithmsProc == nil {
 		err = fmt.Errorf("nCryptEnumAlgorithms() not found in ncrypt.dll")
@@ -2601,6 +2618,9 @@ func (p *Provider) IsAlgSupported(
 		}
 	}()
 
+	logger.Infof("IsAlgSupported, IN : (provider=%v, alg=%s, flags=0x%.8X)", p, alg, flags)
+	defer func() { logger.Infof("IsAlgSupported, OUT: (provider=%v, isSupported=%v)", p, isSupported) }()
+
 	if nCryptIsAlgSupportedProc == nil {
 		err = fmt.Errorf("nCryptIsAlgSupported() not found in ncrypt.dll")
 		return
@@ -2645,6 +2665,9 @@ func (p *Provider) EnumKeys(
 
 	var keyName *ncryptKeyName
 	var enumState unsafe.Pointer
+
+	logger.Infof("EnumKeys, IN : (provider=%v, scope=%s, flags=0x%.8X)", p, scope, flags)
+	defer func() { logger.Infof("EnumKeys, OUT: (provider=%v, keysInfo=%v)", p, keysInfo) }()
 
 	if nCryptEnumKeysProc == nil {
 		err = fmt.Errorf("nCryptEnumKeys() not found in ncrypt.dll")
@@ -2714,6 +2737,9 @@ func (p *Provider) OpenKey(
 	var tempKey Key
 	handle := NcryptKeyHandle(invalidHandleValue)
 	key.handle = NcryptKeyHandle(invalidHandleValue)
+
+	logger.Infof("OpenKey, IN : (provider=%v, keyName=%s, keySpec=%s, flags=0x%.8X)", p, keyName, keySpec.String(), flags)
+	defer func() { logger.Infof("OpenKey, OUT: (provider=%v, key=%v)", p, key) }()
 
 	if nCryptOpenKeyProc == nil {
 		err = fmt.Errorf("nCryptOpenKey() not found in ncrypt.dll")
@@ -2788,6 +2814,10 @@ func (p *Provider) CreatePersistedKey(
 			}
 		}
 	}()
+
+	logger.Infof("CreatePersistedKey, IN : (provider=%v, alg=%s, keyName=%s, keySpec=%s, properties=%v, flags=0x%.8X)",
+		p, alg, keyName, keySpec.String(), properties, flags)
+	defer func() { logger.Infof("CreatePersistedKey, OUT: (provider=%v, key=%v)", p, key) }()
 
 	if nCryptCreatePersistedKeyProc == nil {
 		err = fmt.Errorf("nCryptCreatePersistedKey() not found in ncrypt.dll")
@@ -2905,6 +2935,10 @@ func (p *Provider) ImportKey(
 	handle := NcryptKeyHandle(invalidHandleValue)
 	key.handle = NcryptKeyHandle(invalidHandleValue)
 
+	logger.Infof("ImportKey, IN : (provider=%v, importKey=%v, blobType=%s, parameterList=%v, blobData=%v, flags=0x%.8X)",
+		p, importKey, blobType, parameterList, blobData, flags)
+	defer func() { logger.Infof("ImportKey, OUT: (provider=%v, key=%v)", p, key) }()
+
 	if nCryptImportKeyProc == nil {
 		err = fmt.Errorf("nCryptImportKey() not found in ncrypt.dll")
 		return
@@ -3002,6 +3036,10 @@ func (p *Provider) TranslateHandle(
 	handle := NcryptKeyHandle(invalidHandleValue)
 	key.handle = NcryptKeyHandle(invalidHandleValue)
 
+	logger.Infof("TranslateHandle, IN : (provider=%v, legacyProv=%v, legacyKey=%v, legacyKeySpec=%s, flags=0x%.8X)",
+		p, legacyProv, legacyKey, legacyKeySpec.String(), flags)
+	defer func() { logger.Infof("TranslateHandle, OUT: (provider=%v, key=%v)", p, key) }()
+
 	if nCryptTranslateHandleProc == nil {
 		err = fmt.Errorf("nCryptTranslateHandle() not found in ncrypt.dll")
 		return
@@ -3070,6 +3108,9 @@ func (p *Provider) Close() (ret uint64, err error) {
 		}
 	}()
 
+	logger.Infof("Close, IN : (provider=%v)", p)
+	defer func() { logger.Infof("Close, OUT: (provider=%v)", p) }()
+
 	if nCryptFreeObjectProc == nil {
 		err = fmt.Errorf("nCryptFreeObject() not found in ncrypt.dll")
 		return
@@ -3106,6 +3147,9 @@ func (k *Key) GetProperty(
 			logger.Error(err)
 		}
 	}()
+
+	logger.Infof("GetProperty, IN : (key=%v, propertyName=%s, flags=0x%.8X)", k, propertyName, flags)
+	defer func() { logger.Infof("GetProperty, OUT: (key=%v, property=%v)", k, property) }()
 
 	if nCryptGetPropertyProc == nil {
 		err = fmt.Errorf("nCryptGetProperty() not found in ncrypt.dll")
@@ -3180,6 +3224,9 @@ func (k *Key) SetProperty(
 		}
 	}()
 
+	logger.Infof("SetProperty, IN : (key=%v, propertyName=%s, property=%v, flags=0x%.8X)", k, propertyName, property, flags)
+	defer func() { logger.Infof("SetProperty, OUT: (key=%v, propertyName=%s)", k, propertyName) }()
+
 	if nCryptSetPropertyProc == nil {
 		err = fmt.Errorf("nCryptSetProperty() not found in ncrypt.dll")
 		return
@@ -3227,6 +3274,9 @@ func (k *Key) Encrypt(
 
 	var size uint32
 	var inputPtr *byte
+
+	logger.Infof("Encrypt, IN : (key=%v, input=%v, paddingInfo=%p, flags=0x%.8X)", k, input, paddingInfo, flags)
+	defer func() { logger.Infof("Encrypt, OUT: (key=%v, encryptedData=%v)", k, encryptedData) }()
 
 	if nCryptEncryptProc == nil {
 		err = fmt.Errorf("nCryptEncrypt() not found in ncrypt.dll")
@@ -3304,6 +3354,9 @@ func (k *Key) Decrypt(
 	var size uint32
 	var inputPtr *byte
 
+	logger.Infof("Decrypt, IN : (key=%v, input=%v, paddingInfo=%p, flags=0x%.8X)", k, input, paddingInfo, flags)
+	defer func() { logger.Infof("Decrypt, OUT: (key=%v, decryptedData=%v)", k, decryptedData) }()
+
 	if nCryptDecryptProc == nil {
 		err = fmt.Errorf("nCryptDecryptProc() not found in ncrypt.dll")
 		return
@@ -3380,6 +3433,10 @@ func (k *Key) Export(
 
 	var size uint32
 	var parameterListPtr *NcryptBufferDesc
+
+	logger.Infof("Export, IN : (key=%v, exportKey=%v, blobType=%s, parameterList=%v, flags=0x%.8X)",
+		k, exportKey, blobType, parameterList, flags)
+	defer func() { logger.Infof("Export, OUT: (key=%v, blobData=%v)", k, blobData) }()
 
 	if nCryptExportKeyProc == nil {
 		err = fmt.Errorf("nCryptExportKey() not found in ncrypt.dll")
@@ -3463,6 +3520,9 @@ func (k *Key) Sign(
 	var size uint32
 	var hashValuePtr *byte
 
+	logger.Infof("Sign, IN : (key=%v, paddingInfo=%p, hashValue=%v, flags=0x%.8X)", k, paddingInfo, hashValue, flags)
+	defer func() { logger.Infof("Sign, OUT: (key=%v, signature=%v)", k, signature) }()
+
 	if nCryptSignHashProc == nil {
 		err = fmt.Errorf("nCryptSignHash() not found in ncrypt.dll")
 		return
@@ -3540,6 +3600,9 @@ func (k *Key) Verify(
 	var hashValuePtr *byte
 	var signaturePtr *byte
 
+	logger.Infof("Verify, IN : (key=%v, paddingInfo=%p, hashValue=%v, signature=%v, flags=0x%.8X)", k, paddingInfo, hashValue, signature, flags)
+	defer func() { logger.Infof("Verify, OUT: (key=%v, isVerified=%v)", k, isVerified) }()
+
 	if nCryptVerifySignatureProc == nil {
 		err = fmt.Errorf("nCryptVerifySignature() not found in ncrypt.dll")
 		return
@@ -3588,6 +3651,9 @@ func (k *Key) Delete(
 		}
 	}()
 
+	logger.Infof("Delete, IN : (key=%v, flags=0x%.8X)", k, flags)
+	defer func() { logger.Infof("Delete, OUT: (key=%v)", k) }()
+
 	if nCryptDeleteKeyProc == nil {
 		err = fmt.Errorf("nCryptDeleteKey() not found in ncrypt.dll")
 		return
@@ -3626,6 +3692,9 @@ func (k *Key) SecretAgreement(
 	handle := NcryptSecretHandle(invalidHandleValue)
 	agreedSecret.handle = NcryptSecretHandle(invalidHandleValue)
 
+	logger.Infof("SecretAgreement, IN : (key=%v, pubKeyHandle=0x%.8X, flags=0x%.8X)", k, pubKeyHandle, flags)
+	defer func() { logger.Infof("SecretAgreement, OUT: (key=%v, agreedSecret=%v)", k, agreedSecret) }()
+
 	if nCryptSecretAgreementProc == nil {
 		err = fmt.Errorf("nCryptSecretAgreement() not found in ncrypt.dll")
 		return
@@ -3661,7 +3730,7 @@ func (k *Key) SecretAgreement(
 // use the KeyDerivation function.
 func (s *Secret) Derive(
 	kdfType BcryptKdfType,
-	parameterList *NcryptBufferDesc,
+	parameterList []NcryptBufferDesc,
 	flags NcryptFlag,
 ) (keydata []byte, ret uint64, err error) {
 	defer func() {
@@ -3671,6 +3740,10 @@ func (s *Secret) Derive(
 	}()
 
 	var size uint32
+	var parameterListPtr *NcryptBufferDesc
+
+	logger.Infof("Derive, IN : (secret=%v, kdfType=%s, parameterList=%v, flags=0x%.8X)", s, kdfType, parameterList, flags)
+	defer func() { logger.Infof("Derive, OUT: (secret=%v, keydata=%v)", s, keydata) }()
 
 	if nCryptDeriveKeyProc == nil {
 		err = fmt.Errorf("nCryptDeriveKey() not found in ncrypt.dll")
@@ -3683,10 +3756,14 @@ func (s *Secret) Derive(
 		return
 	}
 
+	if len(parameterList) > 0 {
+		parameterListPtr = &parameterList[0]
+	}
+
 	r, _, msg := nCryptDeriveKeyProc.Call(
 		uintptr(s.handle),
 		uintptr(unsafe.Pointer(utf16KDF)),
-		uintptr(unsafe.Pointer(parameterList)),
+		uintptr(unsafe.Pointer(parameterListPtr)),
 		0,
 		0,
 		uintptr(unsafe.Pointer(&size)),
@@ -3706,7 +3783,7 @@ func (s *Secret) Derive(
 		r, _, msg = nCryptDeriveKeyProc.Call(
 			uintptr(s.handle),
 			uintptr(unsafe.Pointer(utf16KDF)),
-			uintptr(unsafe.Pointer(parameterList)),
+			uintptr(unsafe.Pointer(parameterListPtr)),
 			uintptr(unsafe.Pointer(&keydata[0])),
 			uintptr(size),
 			uintptr(unsafe.Pointer(&size)),
@@ -3747,6 +3824,9 @@ func (k *Key) KeyDerivation(
 
 	var size uint32
 	var parameterListPtr *NcryptBufferDesc
+
+	logger.Infof("KeyDerivation, IN : (key=%v, parameterList=%v, flags=0x%.8X)", k, parameterList, flags)
+	defer func() { logger.Infof("KeyDerivation, OUT: (key=%v, keydata=%v)", k, keydata) }()
 
 	if nCryptDeriveKeyProc == nil {
 		err = fmt.Errorf("nCryptKeyDerivation() not found in ncrypt.dll")
@@ -3811,6 +3891,9 @@ func (k *Key) Close() (ret uint64, err error) {
 			logger.Error(err)
 		}
 	}()
+
+	logger.Infof("Close, IN : (key=%v)", k)
+	defer func() { logger.Infof("Close, OUT: (key=%v)", k) }()
 
 	if nCryptFreeObjectProc == nil {
 		err = fmt.Errorf("nCryptFreeObject() not found in ncrypt.dll")
