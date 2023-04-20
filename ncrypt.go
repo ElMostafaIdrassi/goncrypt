@@ -2646,6 +2646,8 @@ func (p *Provider) IsAlgSupported(
 		return
 	}
 
+	isSupported = true
+
 	return
 }
 
