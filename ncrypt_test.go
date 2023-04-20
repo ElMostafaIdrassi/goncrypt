@@ -3,6 +3,7 @@ package goncrypt
 import (
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"flag"
 	"os"
 	"testing"
@@ -14,8 +15,9 @@ import (
 )
 
 var (
-	verbose    bool
-	testLogger Logger
+	verbose           bool
+	testLogger        Logger
+	rsaPrivateKeyBlob string = "525341320008000003000000000100008000000080000000010001F96884ABE1E3F8F64ECBF80AB27441086D02AFDCCA2A0F08E6256D04C4B5E7AAA48761EF547B35C85A945E5EA82649908DE6770602A877377F93BC5704090BA149EEE3E46B589A02207F20B2FF082DD03E004CED89F91FB15D3EFD0D1DA41E5C1114807862137DD3D90D724B810A4955F5A39CDDA5263DF1110FC882C2824467A607C7A42B250ACA08714A35469DC9F5AE7A13800CCA80272BE360C7E36CA713B249991C536193C89F8872E5424BB8CC1DE5B339E1055ACDB8351F932F46DE1A37AFFE3A1526017DA45C15607C614CDA53173CC23A58C70D12D3DE70AE884D582DFDC845E92E064289860A87533E785DBD1512152628D9F95942F0A8A07A4BE9FA05872A23DB3CBFF8B1F3513DBDEF18A2C923A21A1AAB96104FA9E7FFA51D1A9387F1BB3F71A1BE353B39CD2FE5563B0EE4D027853ABCFFD460FE38985FEBF3A2E546E984BD1BE1D45904462AEC180F3BA5D7AE89852FDDE5AE2F2B5C4C3D1C108F3EF3B98B65B7FC34D13EEB3A039B2C6CD4D6C4ACD751A2BEE0951C04FF77FF5F3C64CE85463AE248513DFF80BCC540F5513A360E994A8D00D45E3761D257C061EEB00E537D034DC1C0B9370661C292963454DCA8ED3445B3B0CDF1874D6393360CB3B23E89A4369E6C8427FE1188A4EFBEA30A126A11FAEED60C10300F3B9A76E451F0F2FECD88B819D23E5E4E5B7B8F4B5850DA373EFD8995E9274FA79F"
 )
 
 func TestMain(m *testing.M) {
@@ -98,6 +100,16 @@ func TestEnumAlgorithms(t *testing.T) {
 	}
 }
 
+func TestIsAlgSupported(t *testing.T) {
+	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
+	defer softwareKsp.Close()
+
+	isAlgSupported, r, err := softwareKsp.IsAlgSupported(NcryptRsaAlgorithm, NcryptSilentFlag)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.Equal(t, true, isAlgSupported)
+}
+
 func TestEnumKeys(t *testing.T) {
 	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
 	defer softwareKsp.Close()
@@ -118,7 +130,7 @@ func TestEnumKeys(t *testing.T) {
 	}
 }
 
-func TestCreateKey(t *testing.T) {
+func TestCreateAndOpenKey(t *testing.T) {
 	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
 	defer softwareKsp.Close()
 
@@ -139,6 +151,81 @@ func TestCreateKey(t *testing.T) {
 		keyName,
 		AtKeyExchange,
 		properties,
+		NcryptSilentFlag,
+	)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	t.Logf("Key Info")
+	t.Logf(" - Name    : %s", key.name)
+	t.Logf(" - Alg     : %v", key.alg)
+	defer key.Delete(NcryptSilentFlag)
+
+	openedKey, r, err := softwareKsp.OpenKey(
+		keyName,
+		AtKeyExchange,
+		NcryptSilentFlag,
+	)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	require.Equal(t, key.alg, openedKey.alg)
+	require.Equal(t, key.name, openedKey.name)
+	defer openedKey.Close()
+}
+
+func TestCreateAndExportKey(t *testing.T) {
+	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
+	defer softwareKsp.Close()
+
+	uuidKeyName, _ := uuid.NewRandom()
+	keyName := uuidKeyName.String()
+
+	lengthBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(lengthBytes, 2048)
+	keyUsageBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(keyUsageBytes, uint32(NcryptAllowSigningFlag|NcryptAllowDecryptFlag))
+	exportPolicyBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(exportPolicyBytes, uint32(NcryptAllowExportFlag|NcryptAllowPlaintextExportFlag|NcryptAllowArchivingFlag|NcryptAllowPlaintextArchivingFlag))
+	properties := map[NcryptProperty][]byte{
+		NcryptLengthProperty:       lengthBytes,
+		NcryptKeyUsageProperty:     keyUsageBytes,
+		NcryptExportPolicyProperty: exportPolicyBytes,
+	}
+
+	key, r, err := softwareKsp.CreatePersistedKey(
+		NcryptRsaAlgorithm,
+		keyName,
+		AtKeyExchange,
+		properties,
+		NcryptSilentFlag,
+	)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	t.Logf("Key Info")
+	t.Logf(" - Name    : %s", key.name)
+	t.Logf(" - Alg     : %v", key.alg)
+	defer key.Delete(NcryptSilentFlag)
+
+	blob, r, err := key.Export(Key{}, NcryptRsaPrivateBlob, nil, NcryptSilentFlag)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	t.Logf("Key Blob: %X", blob)
+}
+
+func TestImportKey(t *testing.T) {
+	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
+	defer softwareKsp.Close()
+
+	rsaPrivateKeyBlobBytes, _ := hex.DecodeString(rsaPrivateKeyBlob)
+
+	key, r, err := softwareKsp.ImportKey(
+		Key{},
+		NcryptRsaPrivateBlob,
+		nil,
+		rsaPrivateKeyBlobBytes,
 		NcryptSilentFlag,
 	)
 	require.NoError(t, err)
