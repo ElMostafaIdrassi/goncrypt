@@ -152,6 +152,8 @@ func TestCreateAndOpenKey(t *testing.T) {
 		AtKeyExchange,
 		properties,
 		NcryptSilentFlag,
+		NcryptSilentFlag,
+		NcryptSilentFlag,
 	)
 	require.NoError(t, err)
 	require.Equal(t, uint64(0), r)
@@ -198,6 +200,8 @@ func TestCreateAndExportKey(t *testing.T) {
 		keyName,
 		AtKeyExchange,
 		properties,
+		NcryptSilentFlag,
+		NcryptSilentFlag,
 		NcryptSilentFlag,
 	)
 	require.NoError(t, err)
@@ -259,6 +263,8 @@ func TestSignVerify(t *testing.T) {
 		AtKeyExchange,
 		properties,
 		NcryptSilentFlag,
+		NcryptSilentFlag,
+		NcryptSilentFlag,
 	)
 	require.NoError(t, err)
 	require.Equal(t, uint64(0), r)
@@ -302,6 +308,8 @@ func TestEncryptDecrypt(t *testing.T) {
 		keyName,
 		AtKeyExchange,
 		properties,
+		NcryptSilentFlag,
+		NcryptSilentFlag,
 		NcryptSilentFlag,
 	)
 	require.NoError(t, err)

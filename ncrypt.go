@@ -2857,7 +2857,9 @@ func (p *Provider) CreatePersistedKey(
 	keyName string,
 	keySpec NcryptLegacyKeySpec,
 	properties map[NcryptProperty][]byte,
-	flags NcryptFlag,
+	createKeyFlags NcryptFlag,
+	setPropertyFlags NcryptFlag,
+	finalizeKeyFlags NcryptFlag,
 ) (key Key, ret uint64, err error) {
 	handle := NcryptKeyHandle(invalidHandleValue)
 	key.handle = NcryptKeyHandle(invalidHandleValue)
@@ -2871,8 +2873,8 @@ func (p *Provider) CreatePersistedKey(
 		}
 	}()
 
-	logger.Infof("CreatePersistedKey, IN : (provider=%v, alg=%s, keyName=%s, keySpec=%s, properties=%v, flags=0x%.8X)",
-		p, alg, keyName, keySpec.String(), properties, flags)
+	logger.Infof("CreatePersistedKey, IN : (provider=%v, alg=%s, keyName=%s, keySpec=%s, properties=%v, createKeyFlags=0x%.8X, setPropertyFlags=0x%.8X, finalizeKeyFlags=0x%.8X)",
+		p, alg, keyName, keySpec.String(), properties, createKeyFlags, setPropertyFlags, finalizeKeyFlags)
 	defer func() { logger.Infof("CreatePersistedKey, OUT: (provider=%v, key=%v)", p, key) }()
 
 	if nCryptCreatePersistedKeyProc == nil {
@@ -2908,7 +2910,7 @@ func (p *Provider) CreatePersistedKey(
 		uintptr(unsafe.Pointer(utf16Alg)),
 		uintptr(unsafe.Pointer(utf16KeyName)),
 		uintptr(keySpec),
-		uintptr(flags),
+		uintptr(createKeyFlags),
 	)
 	if r != 0 {
 		if winErr := maybeWinErr(r); winErr != nil {
@@ -2932,7 +2934,7 @@ func (p *Provider) CreatePersistedKey(
 			uintptr(unsafe.Pointer(utf16Property)),
 			uintptr(unsafe.Pointer(&property[0])),
 			uintptr(len(property)),
-			uintptr(flags),
+			uintptr(setPropertyFlags),
 		)
 		if r != 0 {
 			if winErr := maybeWinErr(r); winErr != nil {
@@ -2946,7 +2948,7 @@ func (p *Provider) CreatePersistedKey(
 
 	r, _, msg = nCryptFinalizeKeyProc.Call(
 		uintptr(handle),
-		uintptr(flags),
+		uintptr(finalizeKeyFlags),
 	)
 	if r != 0 {
 		if winErr := maybeWinErr(r); winErr != nil {
