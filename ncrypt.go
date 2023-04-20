@@ -254,12 +254,12 @@ const (
 	// The BCRYPT_DSA_PUBLIC_BLOB and BCRYPT_DSA_PRIVATE_BLOB blob types are used
 	// to transport plaintext DSA keys. These blob types will be supported by
 	// all DSA primitive providers.
-	BcryptDsaPublicBlob    BcryptKeyBlobType = "DSAPUBLICBLOB"
-	BcryptDsaPrivateBlob   BcryptKeyBlobType = "DSAPRIVATEBLOB"
-	LegacyDsaPublicBlob    BcryptKeyBlobType = "CAPIDSAPUBLICBLOB"
-	LegacyDsaPrivateBlob   BcryptKeyBlobType = "CAPIDSAPRIVATEBLOB"
-	LegacyDsaV2PublicBlob  BcryptKeyBlobType = "V2CAPIDSAPUBLICBLOB"
-	LegacyDsaV2PrivateBlob BcryptKeyBlobType = "V2CAPIDSAPRIVATEBLOB"
+	BcryptDsaPublicBlob          BcryptKeyBlobType = "DSAPUBLICBLOB"
+	BcryptDsaPrivateBlob         BcryptKeyBlobType = "DSAPRIVATEBLOB"
+	BcryptLegacyDsaPublicBlob    BcryptKeyBlobType = "CAPIDSAPUBLICBLOB"
+	BcryptLegacyDsaPrivateBlob   BcryptKeyBlobType = "CAPIDSAPRIVATEBLOB"
+	BcryptLegacyDsaV2PublicBlob  BcryptKeyBlobType = "V2CAPIDSAPUBLICBLOB"
+	BcryptLegacyDsaV2PrivateBlob BcryptKeyBlobType = "V2CAPIDSAPRIVATEBLOB"
 )
 
 type BcryptBlobMagic uint32
@@ -675,9 +675,64 @@ const (
 	NcryptTpmPlatformAttestationStatementMagic    NcryptMagic = 0x414c5054 // 'TPLA'
 )
 
-type NcryptKeyBlobType BcryptKeyBlobType
+type NcryptKeyBlobType string
 
 const (
+	NcryptPublicKeyBlob  NcryptKeyBlobType = "PUBLICBLOB"
+	NcryptPrivateKeyBlob NcryptKeyBlobType = "PRIVATEBLOB"
+
+	// The BCRYPT_RSAPUBLIC_BLOB and BCRYPT_RSAPRIVATE_BLOB blob types are used
+	// to transport plaintext RSA keys. These blob types will be supported by
+	// all RSA primitive providers.
+	// The BCRYPT_RSAPRIVATE_BLOB includes the following values:
+	// Public Exponent
+	// Modulus
+	// Prime1
+	// Prime2
+	NcryptRsaPublicBlob  NcryptKeyBlobType = "RSAPUBLICBLOB"
+	NcryptRsaPrivateBlob NcryptKeyBlobType = "RSAPRIVATEBLOB"
+	// The BCRYPT_RSAFULLPRIVATE_BLOB blob type is used to transport
+	// plaintext private RSA keys.  It includes the following values:
+	// Public Exponent
+	// Modulus
+	// Prime1
+	// Prime2
+	// Private Exponent mod (Prime1 - 1)
+	// Private Exponent mod (Prime2 - 1)
+	// Inverse of Prime2 mod Prime1
+	// PrivateExponent
+	NcryptRsaFullPrivateBlob   NcryptKeyBlobType = "RSAFULLPRIVATEBLOB"
+	NcryptLegacyRsaPublicBlob  NcryptKeyBlobType = "CAPIPUBLICBLOB"
+	NcryptLegacyRsaPrivateBlob NcryptKeyBlobType = "CAPIPRIVATEBLOB"
+
+	// The BCRYPT_ECCPUBLIC_BLOB and BCRYPT_ECCPRIVATE_BLOB blob types are used
+	// to transport plaintext ECC keys. These blob types will be supported by
+	// all ECC primitive providers.
+	NcryptEccPublicBlob      NcryptKeyBlobType = "ECCPUBLICBLOB"
+	NcryptEccPrivateBlob     NcryptKeyBlobType = "ECCPRIVATEBLOB"
+	NcryptEccFullPublicBlob  NcryptKeyBlobType = "ECCFULLPUBLICBLOB"
+	NcryptEccFullPrivateBlob NcryptKeyBlobType = "ECCFULLPRIVATEBLOB"
+
+	NcryptSslEccPublicBlob NcryptKeyBlobType = "SSLECCPUBLICBLOB"
+
+	// The BCRYPT_DH_PUBLIC_BLOB and BCRYPT_DH_PRIVATE_BLOB blob types are used
+	// to transport plaintext DH keys. These blob types will be supported by
+	// all DH primitive providers.
+	NcryptDhPublicBlob        NcryptKeyBlobType = "DHPUBLICBLOB"
+	NcryptDhPrivateBlob       NcryptKeyBlobType = "DHPRIVATEBLOB"
+	NcryptLegacyDhPublicBlob  NcryptKeyBlobType = "CAPIDHPUBLICBLOB"
+	NcryptLegacyDhPrivateBlob NcryptKeyBlobType = "CAPIDHPRIVATEBLOB"
+
+	// The BCRYPT_DSA_PUBLIC_BLOB and BCRYPT_DSA_PRIVATE_BLOB blob types are used
+	// to transport plaintext DSA keys. These blob types will be supported by
+	// all DSA primitive providers.
+	NcryptDsaPublicBlob          NcryptKeyBlobType = "DSAPUBLICBLOB"
+	NcryptDsaPrivateBlob         NcryptKeyBlobType = "DSAPRIVATEBLOB"
+	NcryptLegacyDsaPublicBlob    NcryptKeyBlobType = "CAPIDSAPUBLICBLOB"
+	NcryptLegacyDsaPrivateBlob   NcryptKeyBlobType = "CAPIDSAPRIVATEBLOB"
+	NcryptLegacyDsaV2PublicBlob  NcryptKeyBlobType = "V2CAPIDSAPUBLICBLOB"
+	NcryptLegacyDsaV2PrivateBlob NcryptKeyBlobType = "V2CAPIDSAPRIVATEBLOB"
+
 	NcryptCipherKeyBlob           NcryptKeyBlobType = "CipherKeyBlob"
 	NcryptKdfKeyBlob              NcryptKeyBlobType = "KDFKeyBlob"
 	NcryptProtectedKeyBlob        NcryptKeyBlobType = "ProtectedKeyBlob"
@@ -2773,7 +2828,7 @@ func (p *Provider) OpenKey(
 	tempKey.handle = handle
 	tempKey.name = keyName
 
-	keyAlgBytes, ret, err = key.GetProperty(NcryptAlgorithmProperty, NcryptSilentFlag)
+	keyAlgBytes, ret, err = tempKey.GetProperty(NcryptAlgorithmProperty, NcryptSilentFlag)
 	if err != nil {
 		err = fmt.Errorf("failed to get key algorithm (%v)", err)
 		tempKey.Close()
@@ -2917,7 +2972,7 @@ func (p *Provider) CreatePersistedKey(
 func (p *Provider) ImportKey(
 	importKey Key,
 	blobType NcryptKeyBlobType,
-	parameterList []NcryptBufferDesc,
+	parameterList *NcryptBufferDesc,
 	blobData []byte,
 	flags NcryptFlag,
 ) (key Key, ret uint64, err error) {
@@ -2927,12 +2982,9 @@ func (p *Provider) ImportKey(
 		}
 	}()
 
-	var parameterListPtr *NcryptBufferDesc
 	var blobDataPtr *byte
 	var keyAlgBytes []byte
 	var keyAlg string
-	var keyNameBytes []byte
-	var keyName string
 	var tempKey Key
 	handle := NcryptKeyHandle(invalidHandleValue)
 	key.handle = NcryptKeyHandle(invalidHandleValue)
@@ -2952,9 +3004,6 @@ func (p *Provider) ImportKey(
 		return
 	}
 
-	if len(parameterList) > 0 {
-		parameterListPtr = &parameterList[0]
-	}
 	if len(blobData) > 0 {
 		blobDataPtr = &blobData[0]
 	}
@@ -2963,7 +3012,7 @@ func (p *Provider) ImportKey(
 		uintptr(p.handle),
 		uintptr(importKey.handle),
 		uintptr(unsafe.Pointer(utf16BlobType)),
-		uintptr(unsafe.Pointer(parameterListPtr)),
+		uintptr(unsafe.Pointer(parameterList)),
 		uintptr(unsafe.Pointer(&handle)),
 		uintptr(unsafe.Pointer(blobDataPtr)),
 		uintptr(len(blobData)),
@@ -2993,21 +3042,8 @@ func (p *Provider) ImportKey(
 		return
 	}
 
-	keyNameBytes, ret, err = tempKey.GetProperty(NcryptNameProperty, NcryptSilentFlag)
-	if err != nil {
-		err = fmt.Errorf("failed to get key name (%v)", err)
-		tempKey.Delete(NcryptSilentFlag)
-		return
-	}
-	keyName, err = utf16BytesToString(keyNameBytes)
-	if err != nil {
-		err = fmt.Errorf("failed to parse key name (%v)", err)
-		tempKey.Delete(NcryptSilentFlag)
-		return
-	}
-
 	tempKey.alg = NcryptAlgorithm(keyAlg)
-	tempKey.name = keyName
+	tempKey.name = ""
 
 	key = tempKey
 
@@ -3424,7 +3460,7 @@ func (k *Key) Decrypt(
 func (k *Key) Export(
 	exportKey Key,
 	blobType NcryptKeyBlobType,
-	parameterList []NcryptBufferDesc,
+	parameterList *NcryptBufferDesc,
 	flags NcryptFlag,
 ) (blobData []byte, ret uint64, err error) {
 	defer func() {
@@ -3434,7 +3470,6 @@ func (k *Key) Export(
 	}()
 
 	var size uint32
-	var parameterListPtr *NcryptBufferDesc
 
 	logger.Infof("Export, IN : (key=%v, exportKey=%v, blobType=%s, parameterList=%v, flags=0x%.8X)",
 		k, exportKey, blobType, parameterList, flags)
@@ -3451,15 +3486,11 @@ func (k *Key) Export(
 		return
 	}
 
-	if len(parameterList) > 0 {
-		parameterListPtr = &parameterList[0]
-	}
-
 	r, _, msg := nCryptExportKeyProc.Call(
 		uintptr(k.handle),
 		uintptr(exportKey.handle),
 		uintptr(unsafe.Pointer(utf16BlobType)),
-		uintptr(unsafe.Pointer(parameterListPtr)),
+		uintptr(unsafe.Pointer(parameterList)),
 		0,
 		0,
 		uintptr(unsafe.Pointer(&size)),
@@ -3480,7 +3511,7 @@ func (k *Key) Export(
 			uintptr(k.handle),
 			uintptr(exportKey.handle),
 			uintptr(unsafe.Pointer(utf16BlobType)),
-			uintptr(unsafe.Pointer(parameterListPtr)),
+			uintptr(unsafe.Pointer(parameterList)),
 			uintptr(unsafe.Pointer(&blobData[0])),
 			uintptr(size),
 			uintptr(unsafe.Pointer(&size)),
@@ -3732,7 +3763,7 @@ func (k *Key) SecretAgreement(
 // use the KeyDerivation function.
 func (s *Secret) Derive(
 	kdfType BcryptKdfType,
-	parameterList []NcryptBufferDesc,
+	parameterList *NcryptBufferDesc,
 	flags NcryptFlag,
 ) (keydata []byte, ret uint64, err error) {
 	defer func() {
@@ -3742,7 +3773,6 @@ func (s *Secret) Derive(
 	}()
 
 	var size uint32
-	var parameterListPtr *NcryptBufferDesc
 
 	logger.Infof("Derive, IN : (secret=%v, kdfType=%s, parameterList=%v, flags=0x%.8X)", s, kdfType, parameterList, flags)
 	defer func() { logger.Infof("Derive, OUT: (secret=%v, keydata=%v)", s, keydata) }()
@@ -3758,14 +3788,10 @@ func (s *Secret) Derive(
 		return
 	}
 
-	if len(parameterList) > 0 {
-		parameterListPtr = &parameterList[0]
-	}
-
 	r, _, msg := nCryptDeriveKeyProc.Call(
 		uintptr(s.handle),
 		uintptr(unsafe.Pointer(utf16KDF)),
-		uintptr(unsafe.Pointer(parameterListPtr)),
+		uintptr(unsafe.Pointer(parameterList)),
 		0,
 		0,
 		uintptr(unsafe.Pointer(&size)),
@@ -3785,7 +3811,7 @@ func (s *Secret) Derive(
 		r, _, msg = nCryptDeriveKeyProc.Call(
 			uintptr(s.handle),
 			uintptr(unsafe.Pointer(utf16KDF)),
-			uintptr(unsafe.Pointer(parameterListPtr)),
+			uintptr(unsafe.Pointer(parameterList)),
 			uintptr(unsafe.Pointer(&keydata[0])),
 			uintptr(size),
 			uintptr(unsafe.Pointer(&size)),
@@ -3815,7 +3841,7 @@ func (s *Secret) Derive(
 // by using the specified key derivation function.
 // The function returns the key in a byte array.
 func (k *Key) KeyDerivation(
-	parameterList []NcryptBufferDesc,
+	parameterList *NcryptBufferDesc,
 	flags NcryptFlag,
 ) (keydata []byte, ret uint64, err error) {
 	defer func() {
@@ -3825,7 +3851,6 @@ func (k *Key) KeyDerivation(
 	}()
 
 	var size uint32
-	var parameterListPtr *NcryptBufferDesc
 
 	logger.Infof("KeyDerivation, IN : (key=%v, parameterList=%v, flags=0x%.8X)", k, parameterList, flags)
 	defer func() { logger.Infof("KeyDerivation, OUT: (key=%v, keydata=%v)", k, keydata) }()
@@ -3835,13 +3860,9 @@ func (k *Key) KeyDerivation(
 		return
 	}
 
-	if len(parameterList) > 0 {
-		parameterListPtr = &parameterList[0]
-	}
-
 	r, _, msg := nCryptKeyDerivationProc.Call(
 		uintptr(k.handle),
-		uintptr(unsafe.Pointer(parameterListPtr)),
+		uintptr(unsafe.Pointer(parameterList)),
 		0,
 		0,
 		uintptr(unsafe.Pointer(&size)),
@@ -3860,7 +3881,7 @@ func (k *Key) KeyDerivation(
 		keydata = make([]byte, size)
 		r, _, msg = nCryptKeyDerivationProc.Call(
 			uintptr(k.handle),
-			uintptr(unsafe.Pointer(parameterListPtr)),
+			uintptr(unsafe.Pointer(parameterList)),
 			uintptr(unsafe.Pointer(&keydata[0])),
 			uintptr(size),
 			uintptr(unsafe.Pointer(&size)),
