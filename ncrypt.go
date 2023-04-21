@@ -3599,7 +3599,7 @@ func (k *Key) Sign(
 			msg = winErr
 		}
 		ret = uint64(r)
-		err = fmt.Errorf("nCryptSignHash() returned %X (%v)", r, msg)
+		err = fmt.Errorf("nCryptSignHash() 1st call returned %X (%v)", r, msg)
 		return
 	}
 
@@ -3621,7 +3621,7 @@ func (k *Key) Sign(
 			}
 			signature = nil
 			ret = uint64(r)
-			err = fmt.Errorf("nCryptSignHash() returned %X (%v)", r, msg)
+			err = fmt.Errorf("nCryptSignHash() 2nd call returned %X (%v)", r, msg)
 			return
 		}
 
