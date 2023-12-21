@@ -262,47 +262,47 @@ const (
 	BcryptLegacyDsaV2PrivateBlob BcryptKeyBlobType = "V2CAPIDSAPRIVATEBLOB"
 )
 
-type BcryptBlobMagic uint32
+type BcryptMagic uint32
 
 const (
-	BcryptRsaPublicMagic      BcryptBlobMagic = 0x31415352 // RSA1
-	BcryptRsaPrivateMagic     BcryptBlobMagic = 0x32415352 // RSA2
-	BcryptRsaFullPrivateMagic BcryptBlobMagic = 0x33415352 // RSA3
+	BcryptRsaPublicMagic      BcryptMagic = 0x31415352 // RSA1
+	BcryptRsaPrivateMagic     BcryptMagic = 0x32415352 // RSA2
+	BcryptRsaFullPrivateMagic BcryptMagic = 0x33415352 // RSA3
 
-	BcryptEcdhPublicP256Magic     BcryptBlobMagic = 0x314B4345 // ECK1
-	BcryptEcdhPrivateP256Magic    BcryptBlobMagic = 0x324B4345 // ECK2
-	BcryptEcdhPublicP384Magic     BcryptBlobMagic = 0x334B4345 // ECK3
-	BcryptEcdhPrivateP384Magic    BcryptBlobMagic = 0x344B4345 // ECK4
-	BcryptEcdhPublicP521Magic     BcryptBlobMagic = 0x354B4345 // ECK5
-	BcryptEcdhPrivateP521Magic    BcryptBlobMagic = 0x364B4345 // ECK6
-	BcryptEcdhPublicGenericMagic  BcryptBlobMagic = 0x504B4345 // ECKP
-	BcryptEcdhPrivateGenericMagic BcryptBlobMagic = 0x564B4345 // ECKV
+	BcryptEcdhPublicP256Magic     BcryptMagic = 0x314B4345 // ECK1
+	BcryptEcdhPrivateP256Magic    BcryptMagic = 0x324B4345 // ECK2
+	BcryptEcdhPublicP384Magic     BcryptMagic = 0x334B4345 // ECK3
+	BcryptEcdhPrivateP384Magic    BcryptMagic = 0x344B4345 // ECK4
+	BcryptEcdhPublicP521Magic     BcryptMagic = 0x354B4345 // ECK5
+	BcryptEcdhPrivateP521Magic    BcryptMagic = 0x364B4345 // ECK6
+	BcryptEcdhPublicGenericMagic  BcryptMagic = 0x504B4345 // ECKP
+	BcryptEcdhPrivateGenericMagic BcryptMagic = 0x564B4345 // ECKV
 
-	BcryptEcdsaPublicP256Magic     BcryptBlobMagic = 0x31534345 // ECS1
-	BcryptEcdsaPrivateP256Magic    BcryptBlobMagic = 0x32534345 // ECS2
-	BcryptEcdsaPublicP384Magic     BcryptBlobMagic = 0x33534345 // ECS3
-	BcryptEcdsaPrivateP384Magic    BcryptBlobMagic = 0x34534345 // ECS4
-	BcryptEcdsaPublicP521Magic     BcryptBlobMagic = 0x35534345 // ECS5
-	BcryptEcdsaPrivateP521Magic    BcryptBlobMagic = 0x36534345 // ECS6
-	BcryptEcdsaPublicGenericMagic  BcryptBlobMagic = 0x50444345 // ECDP
-	BcryptEcdsaPrivateGenericMagic BcryptBlobMagic = 0x56444345 // ECDV
+	BcryptEcdsaPublicP256Magic     BcryptMagic = 0x31534345 // ECS1
+	BcryptEcdsaPrivateP256Magic    BcryptMagic = 0x32534345 // ECS2
+	BcryptEcdsaPublicP384Magic     BcryptMagic = 0x33534345 // ECS3
+	BcryptEcdsaPrivateP384Magic    BcryptMagic = 0x34534345 // ECS4
+	BcryptEcdsaPublicP521Magic     BcryptMagic = 0x35534345 // ECS5
+	BcryptEcdsaPrivateP521Magic    BcryptMagic = 0x36534345 // ECS6
+	BcryptEcdsaPublicGenericMagic  BcryptMagic = 0x50444345 // ECDP
+	BcryptEcdsaPrivateGenericMagic BcryptMagic = 0x56444345 // ECDV
 
-	BcryptDhPublicMagic  BcryptBlobMagic = 0x42504844 // DHPB
-	BcryptDhPrivateMagic BcryptBlobMagic = 0x56504844 // DHPV
+	BcryptDhPublicMagic  BcryptMagic = 0x42504844 // DHPB
+	BcryptDhPrivateMagic BcryptMagic = 0x56504844 // DHPV
 
-	BcryptDsaPublicMagic    BcryptBlobMagic = 0x42505344 // DSPB
-	BcryptDsaPrivateMagic   BcryptBlobMagic = 0x56505344 // DSPV
-	BcryptDsaPublicMagicV2  BcryptBlobMagic = 0x32425044 // DPB2
-	BcryptDsaPrivateMagicV2 BcryptBlobMagic = 0x32565044 // DPV2
+	BcryptDsaPublicMagic    BcryptMagic = 0x42505344 // DSPB
+	BcryptDsaPrivateMagic   BcryptMagic = 0x56505344 // DSPV
+	BcryptDsaPublicMagicV2  BcryptMagic = 0x32425044 // DPB2
+	BcryptDsaPrivateMagicV2 BcryptMagic = 0x32565044 // DPV2
 
-	BcryptDhParametersMagic BcryptBlobMagic = 0x4d504844 // DHPM
+	BcryptDhParametersMagic BcryptMagic = 0x4d504844 // DHPM
 
-	BcryptKeyDataBlobMagic BcryptBlobMagic = 0x4d42444b // Key Data Blob Magic (KDBM)
+	BcryptKeyDataBlobMagic BcryptMagic = 0x4d42444b // Key Data Blob Magic (KDBM)
 
-	BcryptDsaParametersMagic   BcryptBlobMagic = 0x4d505344 // DSPM
-	BcryptDsaParametersMagicV2 BcryptBlobMagic = 0x324d5044 // DPM2
+	BcryptDsaParametersMagic   BcryptMagic = 0x4d505344 // DSPM
+	BcryptDsaParametersMagicV2 BcryptMagic = 0x324d5044 // DPM2
 
-	BcryptEccParametersMagic BcryptBlobMagic = 0x50434345 // ECCP
+	BcryptEccParametersMagic BcryptMagic = 0x50434345 // ECCP
 )
 
 // enum ECC_CURVE_TYPE_ENUM
@@ -359,27 +359,22 @@ const (
 	BcryptEccCurveBrainpoolP384T1 BcryptEccCurve = "brainpoolP384t1"
 	BcryptEccCurveBrainpoolP512R1 BcryptEccCurve = "brainpoolP512r1"
 	BcryptEccCurveBrainpoolP512T1 BcryptEccCurve = "brainpoolP512t1"
-
-	BcryptEccCurve25519 BcryptEccCurve = "curve25519"
-
-	BcryptEccCurveEc192Wapi BcryptEccCurve = "ec192wapi"
-
-	BcryptEccCurveNistP192 BcryptEccCurve = "nistP192"
-	BcryptEccCurveNistP224 BcryptEccCurve = "nistP224"
-	BcryptEccCurveNistP256 BcryptEccCurve = "nistP256"
-	BcryptEccCurveNistP384 BcryptEccCurve = "nistP384"
-	BcryptEccCurveNistP521 BcryptEccCurve = "nistP521"
-
-	BcryptEccCurveNumsp256T1 BcryptEccCurve = "numsP256t1"
-	BcryptEccCurveNumsp384T1 BcryptEccCurve = "numsP384t1"
-	BcryptEccCurveNumsp512T1 BcryptEccCurve = "numsP512t1"
-
-	BcryptEccCurveSecp160K1 BcryptEccCurve = "secP160k1"
-	BcryptEccCurveSecp160R1 BcryptEccCurve = "secP160r1"
-	BcryptEccCurveSecp160R2 BcryptEccCurve = "secP160r2"
-	BcryptEccCurveSecp192K1 BcryptEccCurve = "secP192k1"
-	BcryptEccCurveSecp192R1 BcryptEccCurve = "secP192r1"
-	BcryptEccCurveSecp224K1 BcryptEccCurve = "secP224r1"
+	BcryptEccCurve25519           BcryptEccCurve = "curve25519"
+	BcryptEccCurveEc192Wapi       BcryptEccCurve = "ec192wapi"
+	BcryptEccCurveNistP192        BcryptEccCurve = "nistP192"
+	BcryptEccCurveNistP224        BcryptEccCurve = "nistP224"
+	BcryptEccCurveNistP256        BcryptEccCurve = "nistP256"
+	BcryptEccCurveNistP384        BcryptEccCurve = "nistP384"
+	BcryptEccCurveNistP521        BcryptEccCurve = "nistP521"
+	BcryptEccCurveNumsp256T1      BcryptEccCurve = "numsP256t1"
+	BcryptEccCurveNumsp384T1      BcryptEccCurve = "numsP384t1"
+	BcryptEccCurveNumsp512T1      BcryptEccCurve = "numsP512t1"
+	BcryptEccCurveSecp160K1       BcryptEccCurve = "secP160k1"
+	BcryptEccCurveSecp160R1       BcryptEccCurve = "secP160r1"
+	BcryptEccCurveSecp160R2       BcryptEccCurve = "secP160r2"
+	BcryptEccCurveSecp192K1       BcryptEccCurve = "secP192k1"
+	BcryptEccCurveSecp192R1       BcryptEccCurve = "secP192r1"
+	BcryptEccCurveSecp224K1       BcryptEccCurve = "secP224r1"
 )
 
 //
@@ -387,11 +382,11 @@ const (
 //
 
 type BcryptKeyBlob struct {
-	Magic BcryptBlobMagic
+	Magic BcryptMagic
 }
 
 type BcryptRsaKeyBlob struct {
-	Magic        BcryptBlobMagic
+	Magic        BcryptMagic
 	BitLength    uint32
 	PublicExpLen uint32
 	ModulusLen   uint32
@@ -400,7 +395,7 @@ type BcryptRsaKeyBlob struct {
 }
 
 type BcryptEccKeyBlob struct {
-	Magic  BcryptBlobMagic
+	Magic  BcryptMagic
 	KeyLen uint32
 }
 type BcryptSslEccKeyBlob struct {
@@ -411,7 +406,7 @@ type BcryptSslEccKeyBlob struct {
 // The full version contains the curve parameters as well
 // as the public and potentially private exponent.
 type BcryptEccFullKeyBlob struct {
-	Magic                BcryptBlobMagic
+	Magic                BcryptMagic
 	Version              uint32              // Version of the structure
 	CurveType            BcryptEccCurveType  // Supported curve types.
 	CurveGenerationAlgId BcryptEccCurveAlgId // For X.592 verification purposes, if we include Seed we will need to include the algorithm ID.
@@ -433,24 +428,24 @@ type BcryptEccFullKeyBlob struct {
 }
 
 type BcryptDhKeyBlob struct {
-	Magic  BcryptBlobMagic
+	Magic  BcryptMagic
 	KeyLen uint32
 }
 type BcryptDhParameterHeader struct {
-	Length BcryptBlobMagic
+	Length BcryptMagic
 	Magic  uint32
 	KeyLen uint32
 }
 
 type BcryptDsaKeyBlob struct {
-	Magic  BcryptBlobMagic
+	Magic  BcryptMagic
 	KeyLen uint32
 	Count  [4]byte
 	Seed   [20]byte
 	Q      [20]byte
 }
 type BcryptDsaKeyBlobV2 struct {
-	Magic           BcryptBlobMagic
+	Magic           BcryptMagic
 	KeyLen          uint32
 	HashAlgorithm   BcryptHashAlgorithmEnum
 	StandardVersion BcryptDsaFipsVersionEnum
@@ -460,14 +455,14 @@ type BcryptDsaKeyBlobV2 struct {
 }
 
 type BcryptKeyDataBlobHeader struct {
-	Magic      BcryptBlobMagic
+	Magic      BcryptMagic
 	Version    uint32
 	KeyDataLen uint32
 }
 
 type BcryptDsaParameterHeader struct {
 	Length uint32
-	Magic  BcryptBlobMagic
+	Magic  BcryptMagic
 	KeyLen uint32
 	Count  [4]byte
 	Seed   [20]byte
@@ -475,7 +470,7 @@ type BcryptDsaParameterHeader struct {
 }
 type BcryptDsaParameterHeaderV2 struct {
 	Length          uint32
-	Magic           BcryptBlobMagic
+	Magic           BcryptMagic
 	KeyLen          uint32
 	HashAlgorithm   BcryptHashAlgorithmEnum
 	StandardVersion BcryptDsaFipsVersionEnum
@@ -664,6 +659,36 @@ const (
 type NcryptMagic uint32
 
 const (
+	NcryptRsaPublicMagic                          NcryptMagic = 0x31415352 // RSA1
+	NcryptRsaPrivateMagic                         NcryptMagic = 0x32415352 // RSA2
+	NcryptRsaFullPrivateMagic                     NcryptMagic = 0x33415352 // RSA3
+	NcryptEcdhPublicP256Magic                     NcryptMagic = 0x314B4345 // ECK1
+	NcryptEcdhPrivateP256Magic                    NcryptMagic = 0x324B4345 // ECK2
+	NcryptEcdhPublicP384Magic                     NcryptMagic = 0x334B4345 // ECK3
+	NcryptEcdhPrivateP384Magic                    NcryptMagic = 0x344B4345 // ECK4
+	NcryptEcdhPublicP521Magic                     NcryptMagic = 0x354B4345 // ECK5
+	NcryptEcdhPrivateP521Magic                    NcryptMagic = 0x364B4345 // ECK6
+	NcryptEcdhPublicGenericMagic                  NcryptMagic = 0x504B4345 // ECKP
+	NcryptEcdhPrivateGenericMagic                 NcryptMagic = 0x564B4345 // ECKV
+	NcryptEcdsaPublicP256Magic                    NcryptMagic = 0x31534345 // ECS1
+	NcryptEcdsaPrivateP256Magic                   NcryptMagic = 0x32534345 // ECS2
+	NcryptEcdsaPublicP384Magic                    NcryptMagic = 0x33534345 // ECS3
+	NcryptEcdsaPrivateP384Magic                   NcryptMagic = 0x34534345 // ECS4
+	NcryptEcdsaPublicP521Magic                    NcryptMagic = 0x35534345 // ECS5
+	NcryptEcdsaPrivateP521Magic                   NcryptMagic = 0x36534345 // ECS6
+	NcryptEcdsaPublicGenericMagic                 NcryptMagic = 0x50444345 // ECDP
+	NcryptEcdsaPrivateGenericMagic                NcryptMagic = 0x56444345 // ECDV
+	NcryptDhPublicMagic                           NcryptMagic = 0x42504844 // DHPB
+	NcryptDhPrivateMagic                          NcryptMagic = 0x56504844 // DHPV
+	NcryptDsaPublicMagic                          NcryptMagic = 0x42505344 // DSPB
+	NcryptDsaPrivateMagic                         NcryptMagic = 0x56505344 // DSPV
+	NcryptDsaPublicMagicV2                        NcryptMagic = 0x32425044 // DPB2
+	NcryptDsaPrivateMagicV2                       NcryptMagic = 0x32565044 // DPV2
+	NcryptDhParametersMagic                       NcryptMagic = 0x4d504844 // DHPM
+	NcryptKeyDataBlobMagic                        NcryptMagic = 0x4d42444b // Key Data Blob Magic (KDBM)
+	NcryptDsaParametersMagic                      NcryptMagic = 0x4d505344 // DSPM
+	NcryptDsaParametersMagicV2                    NcryptMagic = 0x324d5044 // DPM2
+	NcryptEccParametersMagic                      NcryptMagic = 0x50434345 // ECCP
 	NcryptPlatformAttestMagic                     NcryptMagic = 0x44504150 // 'PAPD'
 	NcryptKeyAttestMagic                          NcryptMagic = 0x4450414b // 'KAPD'
 	NcryptCipherKeyBlobMagic                      NcryptMagic = 0x52485043 // 'CPHR'
@@ -806,6 +831,19 @@ const (
 	NcryptCipherOtherPaddingFlag NcryptCipherPaddingInfoFlag = 0x00000002
 )
 
+func (f *NcryptCipherPaddingInfoFlag) String() string {
+	switch *f {
+	case NcryptCipherNoPaddingFlag:
+		return "CipherNoPadding"
+	case NcryptCipherBlockPaddingFlag:
+		return "CipherBlockPadding"
+	case NcryptCipherOtherPaddingFlag:
+		return "CipherOtherPadding"
+	default:
+		return "N/A"
+	}
+}
+
 //
 // Key attestation claim types
 //
@@ -821,6 +859,34 @@ const (
 	NcryptClaimUnknown                    NcryptClaimType = 0x00001000
 	NcryptClaimPlatform                   NcryptClaimType = 0x00010000
 )
+
+func (t *NcryptClaimType) String() string {
+	output := ""
+
+	if *t&NcryptClaimAuthorityOnly == NcryptClaimAuthorityOnly {
+		output += "ClaimAuthorityOnly;"
+	}
+	if *t&NcryptClaimSubjectOnly == NcryptClaimSubjectOnly {
+		output += "ClaimSubjectOnly;"
+	}
+	if *t&NcryptClaimWebAuthSubjectOnly == NcryptClaimWebAuthSubjectOnly {
+		output += "ClaimWebAuthSubjectOnly;"
+	}
+	if *t&NcryptClaimAuthorityAndSubject == NcryptClaimAuthorityAndSubject {
+		output += "ClaimAuthorityAndSubject;"
+	}
+	if *t&NcryptClaimVsmKeyAttestationStatement == NcryptClaimVsmKeyAttestationStatement {
+		output += "ClaimVsmKeyAttestationStatement;"
+	}
+	if *t&NcryptClaimUnknown == NcryptClaimUnknown {
+		output += "ClaimUnknown;"
+	}
+	if *t&NcryptClaimPlatform == NcryptClaimPlatform {
+		output += "ClaimPlatform;"
+	}
+
+	return output
+}
 
 //
 // NCrypt API Flags
@@ -2835,18 +2901,18 @@ func (p *Provider) OpenKey(
 
 	keyAlgBytes, ret, err = tempKey.GetProperty(NcryptAlgorithmProperty, NcryptSilentFlag)
 	if err != nil {
-		err = fmt.Errorf("failed to get key algorithm (%v)", err)
-		tempKey.Close()
-		return
-	}
-	keyAlg, err = utf16BytesToString(keyAlgBytes)
-	if err != nil {
-		err = fmt.Errorf("failed to parse key algorithm (%v)", err)
-		tempKey.Close()
-		return
+		logger.Errorf("failed to get key algorithm (%v)", err)
+		tempKey.alg = "UNKNOWN"
+	} else {
+		keyAlg, err = utf16BytesToString(keyAlgBytes)
+		if err != nil {
+			err = fmt.Errorf("failed to parse key algorithm (%v)", err)
+			tempKey.Close()
+			return
+		}
+		tempKey.alg = NcryptAlgorithm(keyAlg)
 	}
 
-	tempKey.alg = NcryptAlgorithm(keyAlg)
 	key = tempKey
 
 	return
