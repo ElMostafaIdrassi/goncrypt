@@ -2903,6 +2903,7 @@ func (p *Provider) OpenKey(
 	if err != nil {
 		logger.Errorf("failed to get key algorithm (%v)", err)
 		tempKey.alg = "UNKNOWN"
+		err = nil
 	} else {
 		keyAlg, err = utf16BytesToString(keyAlgBytes)
 		if err != nil {
