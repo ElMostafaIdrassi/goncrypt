@@ -176,6 +176,62 @@ func TestCreateAndOpenKey(t *testing.T) {
 	defer openedKey.Close()
 }
 
+/*
+func TestCreateAndOpenKeyWithUiPolicy(t *testing.T) {
+	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, 0)
+	defer softwareKsp.Close()
+
+	uuidKeyName, _ := uuid.NewRandom()
+	keyName := uuidKeyName.String()
+
+	lengthBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(lengthBytes, 2048)
+	keyUsageBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(keyUsageBytes, uint32(NcryptAllowSigningFlag|NcryptAllowDecryptFlag))
+	uiPolicy := NcryptUiPolicy{
+		Version:      1,
+		FriendlyName: keyName,
+		Flags:        NcryptUiProtectKeyFlag,
+		Description:  "This key requires usage consent and an optional PIN.",
+	}
+	uiPolicyBytes, _ := uiPolicy.serialize()
+	properties := map[NcryptProperty][]byte{
+		NcryptLengthProperty:   lengthBytes,
+		NcryptKeyUsageProperty: keyUsageBytes,
+		NcryptUiPolicyProperty: uiPolicyBytes,
+	}
+
+	key, r, err := softwareKsp.CreatePersistedKey(
+		NcryptRsaAlgorithm,
+		keyName,
+		AtKeyExchange,
+		properties,
+		0,
+		0,
+		0,
+	)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	t.Logf("Key Info")
+	t.Logf(" - Name    : %s", key.name)
+	t.Logf(" - Alg     : %v", key.alg)
+	defer key.Delete(NcryptSilentFlag)
+
+	openedKey, r, err := softwareKsp.OpenKey(
+		keyName,
+		AtKeyExchange,
+		0,
+	)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	require.Equal(t, key.alg, openedKey.alg)
+	require.Equal(t, key.name, openedKey.name)
+	defer openedKey.Close()
+}
+*/
+
 func TestCreateAndExportKey(t *testing.T) {
 	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
 	defer softwareKsp.Close()

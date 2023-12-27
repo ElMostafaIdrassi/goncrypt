@@ -1666,6 +1666,58 @@ type NcryptUiPolicy struct {
 	Description   string
 }
 
+func (n *NcryptUiPolicy) serialize() ([]byte, error) {
+	buf := new(bytes.Buffer)
+
+	if err := binary.Write(buf, binary.LittleEndian, n.Version); err != nil {
+		return nil, err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, n.Flags); err != nil {
+		return nil, err
+	}
+
+	for _, str := range []string{n.CreationTitle, n.FriendlyName, n.Description} {
+		if err := binary.Write(buf, binary.LittleEndian, uint32(len(str))); err != nil {
+			return nil, err
+		}
+		if err := binary.Write(buf, binary.LittleEndian, []byte(str)); err != nil {
+			return nil, err
+		}
+	}
+
+	return buf.Bytes(), nil
+}
+func (n *NcryptUiPolicy) deserialize(data []byte) error {
+	buf := bytes.NewReader(data)
+
+	if err := binary.Read(buf, binary.LittleEndian, &n.Version); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &n.Flags); err != nil {
+		return err
+	}
+
+	var length uint32
+	for i := 0; i < 3; i++ {
+		if err := binary.Read(buf, binary.LittleEndian, &length); err != nil {
+			return err
+		}
+		strBytes := make([]byte, length)
+		if err := binary.Read(buf, binary.LittleEndian, &strBytes); err != nil {
+			return err
+		}
+		switch i {
+		case 0:
+			n.CreationTitle = string(strBytes)
+		case 1:
+			n.FriendlyName = string(strBytes)
+		case 2:
+			n.Description = string(strBytes)
+		}
+	}
+
+	return nil
+}
 func (n *NcryptUiPolicy) fromInternal(internalNcryptUiPolicy ncryptUiPolicy) {
 	n.Version = internalNcryptUiPolicy.Version
 	n.Flags = NcryptUiPolicyPropertyFlag(internalNcryptUiPolicy.Flags)
@@ -2997,6 +3049,23 @@ func (p *Provider) CreatePersistedKey(
 	for propertyName, property := range properties {
 		var utf16PropertyName *uint16
 		var propertyPtr *byte
+
+		if propertyName == NcryptUiPolicyProperty {
+			var internalUiPolicy ncryptUiPolicy
+			var uiPolicy NcryptUiPolicy
+			err = uiPolicy.deserialize(property)
+			if err != nil {
+				err = fmt.Errorf("failed to parse property \"%s\" (%v)", propertyName, err)
+				return
+			}
+			internalUiPolicy, err = uiPolicy.toInternal()
+			if err != nil {
+				err = fmt.Errorf("failed to parse property \"%s\" (%v)", propertyName, err)
+				return
+			}
+			const internalUiPolicySize = int(unsafe.Sizeof(ncryptUiPolicy{}))
+			property = (*(*[internalUiPolicySize]byte)(unsafe.Pointer(&internalUiPolicy)))[:]
+		}
 
 		utf16PropertyName, err = stringToUtf16Ptr(string(propertyName))
 		if err != nil {
