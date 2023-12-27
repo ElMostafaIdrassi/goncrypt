@@ -322,19 +322,19 @@ const (
 )
 
 // enum HASHALGORITHM_ENUM
-type BcryptHashAlgorithmEnum int32
+type BcryptHashAlgorithm int32
 
 const (
-	DsaHashAlgorithmSha1 BcryptHashAlgorithmEnum = iota
+	DsaHashAlgorithmSha1 BcryptHashAlgorithm = iota
 	DsaHashAlgorithmSha256
 	DsaHashAlgorithmSha512
 )
 
 // enum DSAFIPSVERSION_ENUM
-type BcryptDsaFipsVersionEnum int32
+type BcryptDsaFipsVersion int32
 
 const (
-	DsaFips1862 BcryptDsaFipsVersionEnum = iota
+	DsaFips1862 BcryptDsaFipsVersion = iota
 	DsaFips1863
 )
 
@@ -432,8 +432,8 @@ type BcryptDhKeyBlob struct {
 	KeyLen uint32
 }
 type BcryptDhParameterHeader struct {
-	Length BcryptMagic
-	Magic  uint32
+	Length uint32
+	Magic  BcryptMagic
 	KeyLen uint32
 }
 
@@ -447,8 +447,8 @@ type BcryptDsaKeyBlob struct {
 type BcryptDsaKeyBlobV2 struct {
 	Magic           BcryptMagic
 	KeyLen          uint32
-	HashAlgorithm   BcryptHashAlgorithmEnum
-	StandardVersion BcryptDsaFipsVersionEnum
+	HashAlgorithm   BcryptHashAlgorithm
+	StandardVersion BcryptDsaFipsVersion
 	SeedLen         uint32
 	GroupSize       uint32
 	Count           [4]byte
@@ -472,8 +472,8 @@ type BcryptDsaParameterHeaderV2 struct {
 	Length          uint32
 	Magic           BcryptMagic
 	KeyLen          uint32
-	HashAlgorithm   BcryptHashAlgorithmEnum
-	StandardVersion BcryptDsaFipsVersionEnum
+	HashAlgorithm   BcryptHashAlgorithm
+	StandardVersion BcryptDsaFipsVersion
 	SeedLen         uint32
 	GroupSize       uint32
 	Count           [4]byte
@@ -1660,7 +1660,7 @@ type ncryptUiPolicy struct {
 
 type NcryptUiPolicy struct {
 	Version       uint32
-	Flags         uint32
+	Flags         NcryptUiPolicyPropertyFlag
 	CreationTitle string
 	FriendlyName  string
 	Description   string
@@ -1668,7 +1668,7 @@ type NcryptUiPolicy struct {
 
 func (n *NcryptUiPolicy) fromInternal(internalNcryptUiPolicy ncryptUiPolicy) {
 	n.Version = internalNcryptUiPolicy.Version
-	n.Flags = internalNcryptUiPolicy.Flags
+	n.Flags = NcryptUiPolicyPropertyFlag(internalNcryptUiPolicy.Flags)
 	n.CreationTitle = utf16PtrToString(internalNcryptUiPolicy.CreationTitle)
 	n.FriendlyName = utf16PtrToString(internalNcryptUiPolicy.FriendlyName)
 	n.Description = utf16PtrToString(internalNcryptUiPolicy.Description)
@@ -1688,7 +1688,7 @@ func (n *NcryptUiPolicy) toInternal() (ncryptUiPolicy, error) {
 	}
 	return ncryptUiPolicy{
 		Version:       n.Version,
-		Flags:         n.Flags,
+		Flags:         uint32(n.Flags),
 		CreationTitle: creationTitleUtf16Ptr,
 		FriendlyName:  friendlyNameUtf16Ptr,
 		Description:   descriptionUtf16Ptr,
@@ -1737,13 +1737,13 @@ type NcryptPcpRawPolicydigest struct {
 
 type NcryptKeyBlobHeader struct {
 	Size       uint32 // size of this structure
-	Magic      uint32
+	Magic      NcryptMagic
 	AlgNameLen uint32 // size of the algorithm, in bytes, including terminating 0
 	KeyDataLen uint32
 }
 
 type NcryptTpmLoadableKeyBlobHeader struct {
-	Magic      uint32
+	Magic      NcryptMagic
 	HeaderLen  uint32
 	PublicLen  uint32
 	PrivateLen uint32
