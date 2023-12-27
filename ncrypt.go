@@ -1666,7 +1666,7 @@ type NcryptUiPolicy struct {
 	Description   string
 }
 
-func (n *NcryptUiPolicy) serialize() ([]byte, error) {
+func (n *NcryptUiPolicy) Serialize() ([]byte, error) {
 	buf := new(bytes.Buffer)
 
 	if err := binary.Write(buf, binary.LittleEndian, n.Version); err != nil {
@@ -1687,7 +1687,7 @@ func (n *NcryptUiPolicy) serialize() ([]byte, error) {
 
 	return buf.Bytes(), nil
 }
-func (n *NcryptUiPolicy) deserialize(data []byte) error {
+func (n *NcryptUiPolicy) Deserialize(data []byte) error {
 	buf := bytes.NewReader(data)
 
 	if err := binary.Read(buf, binary.LittleEndian, &n.Version); err != nil {
@@ -3053,7 +3053,7 @@ func (p *Provider) CreatePersistedKey(
 		if propertyName == NcryptUiPolicyProperty {
 			var internalUiPolicy ncryptUiPolicy
 			var uiPolicy NcryptUiPolicy
-			err = uiPolicy.deserialize(property)
+			err = uiPolicy.Deserialize(property)
 			if err != nil {
 				err = fmt.Errorf("failed to parse property \"%s\" (%v)", propertyName, err)
 				return
