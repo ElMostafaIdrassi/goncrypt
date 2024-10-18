@@ -110,26 +110,6 @@ func TestIsAlgSupported(t *testing.T) {
 	require.Equal(t, true, isAlgSupported)
 }
 
-func TestEnumKeys(t *testing.T) {
-	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
-	defer softwareKsp.Close()
-
-	keysInfo, r, err := softwareKsp.EnumKeys("", NcryptSilentFlag)
-	require.NoError(t, err)
-	require.Equal(t, uint64(0), r)
-	require.NotNil(t, keysInfo)
-	if len(keysInfo) == 0 {
-		t.Fatal("No keys found")
-	}
-	for i, keyInfo := range keysInfo {
-		t.Logf("Key Info %d", i+1)
-		t.Logf(" - Name    : %s", keyInfo.Name)
-		t.Logf(" - Alg     : %v", keyInfo.Alg)
-		t.Logf(" - KeySpec : %s", keyInfo.LegacyKeySpec.String())
-		t.Logf(" - Flags   : 0x%.8X", keyInfo.Flags)
-	}
-}
-
 func TestCreateAndOpenKey(t *testing.T) {
 	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
 	defer softwareKsp.Close()
@@ -295,6 +275,59 @@ func TestImportKey(t *testing.T) {
 	t.Logf(" - Name    : %s", key.name)
 	t.Logf(" - Alg     : %v", key.alg)
 	defer key.Delete(NcryptSilentFlag)
+}
+
+func TestEnumKeys(t *testing.T) {
+	softwareKsp, _, _ := OpenProvider(MsKeyStorageProvider, NcryptSilentFlag)
+	defer softwareKsp.Close()
+
+	uuidKeyName, _ := uuid.NewRandom()
+	keyName := uuidKeyName.String()
+	lengthBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(lengthBytes, 2048)
+	keyUsageBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(keyUsageBytes, uint32(NcryptAllowSigningFlag|NcryptAllowDecryptFlag))
+	exportPolicyBytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(exportPolicyBytes, uint32(NcryptAllowExportFlag|NcryptAllowPlaintextExportFlag|NcryptAllowArchivingFlag|NcryptAllowPlaintextArchivingFlag))
+	properties := map[NcryptProperty][]byte{
+		NcryptLengthProperty:       lengthBytes,
+		NcryptKeyUsageProperty:     keyUsageBytes,
+		NcryptExportPolicyProperty: exportPolicyBytes,
+	}
+
+	key, r, err := softwareKsp.CreatePersistedKey(
+		NcryptRsaAlgorithm,
+		keyName,
+		AtKeyExchange,
+		properties,
+		NcryptSilentFlag,
+		NcryptSilentFlag,
+		NcryptSilentFlag,
+	)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	require.NotNil(t, key)
+	defer key.Delete(NcryptSilentFlag)
+
+	bKeyFound := false
+	keysInfo, r, err := softwareKsp.EnumKeys("", NcryptSilentFlag)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), r)
+	if len(keysInfo) == 0 {
+		t.Fatal("No keys found")
+	}
+	for i, keyInfo := range keysInfo {
+		if keyInfo.Name == key.name {
+			bKeyFound = true
+			t.Logf("Key Info %d", i+1)
+			t.Logf(" - Name    : %s", keyInfo.Name)
+			t.Logf(" - Alg     : %v", keyInfo.Alg)
+			t.Logf(" - KeySpec : %s", keyInfo.LegacyKeySpec.String())
+			t.Logf(" - Flags   : 0x%.8X", keyInfo.Flags)
+			break
+		}
+	}
+	require.Equal(t, true, bKeyFound)
 }
 
 func TestSignVerify(t *testing.T) {
