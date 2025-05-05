@@ -1,13 +1,12 @@
 module github.com/ElMostafaIdrassi/goncrypt
 
 go 1.23
-
-toolchain go1.23.2
+toolchain go1.24.1
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/sys v0.29.0
+	golang.org/x/sys v0.33.0
 )
 
 require (
