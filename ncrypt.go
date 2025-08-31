@@ -2548,7 +2548,12 @@ func EnumProviders(
 	}()
 
 	if providersCount > 0 {
-		providerList := (*[1 << 30]ncryptProviderName)(unsafe.Pointer(providerListPtr))[:providersCount:providersCount]
+		count := int(providersCount)
+		if count < 0 {
+			err = fmt.Errorf("providersCount exceeds max int on this architecture")
+			return
+		}
+		providerList := unsafe.Slice((*ncryptProviderName)(unsafe.Pointer(providerListPtr)), count)
 		provsInfo = make([]NcryptProviderInfo, providersCount)
 		for i := range provsInfo {
 			provsInfo[i].fromInternal(providerList[i])
@@ -2786,7 +2791,12 @@ func (p *Provider) EnumAlgorithms(
 	}()
 
 	if algCount > 0 {
-		algList := (*[1 << 30]ncryptAlgorithmName)(unsafe.Pointer(algListPtr))[:algCount:algCount]
+		count := int(algCount)
+		if count < 0 {
+			err = fmt.Errorf("algCount exceeds max int on this architecture")
+			return
+		}
+		algList := unsafe.Slice((*ncryptAlgorithmName)(unsafe.Pointer(algListPtr)), count)
 		algsInfo = make([]NcryptAlgorithmInfo, algCount)
 		for i := range algsInfo {
 			algsInfo[i].fromInternal(algList[i])
